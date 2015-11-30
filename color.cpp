@@ -103,14 +103,18 @@ void sendObjectLocToArduino(int x, int y) {
   set_blocking (fd, 0);                // set no blocking
 
 	ostringstream x_stream;
-	x_stream << x_dummy;
+	//x_stream << x_dummy;
+	x_stream << x;
+
 	ostringstream y_stream;
-	y_stream << y_dummy;
+	//y_stream << y_dummy;
+	y_stream << y;
+
 
 	string x_str = x_stream.str();
 	string y_str = y_stream.str();
-	//printf("X: %s\n", x_str.c_str());
-	//printf("Y: %s\n", y_str.c_str());
+	printf("X: %s\n", x_str.c_str());
+	printf("Y: %s\n", y_str.c_str());
 /*	int x_len = x_str.length();
 	int y_len = x_str.length();
 	printf("X length: %d\n", x_len);
@@ -281,7 +285,9 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
 			if(objectFound ==true){
 				putText(cameraFeed,"Tracking Object",Point(0,50),2,1,Scalar(0,255,0),2);
 				//draw object location on screen
-				drawObject(x,y,cameraFeed);}
+				drawObject(x,y,cameraFeed);
+				sendObjectLocToArduino(x, y);
+			}
 
 		}else putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
 	}
@@ -338,7 +344,7 @@ int main(int argc, char* argv[])
 		//filtered object
 		if(trackObjects) {
 			trackFilteredObject(x,y,threshold,cameraFeed);
-			sendObjectLocToArduino(x, y);
+			//sendObjectLocToArduino(x, y);
 			//usleep(500000);
 		}
 		//show frames
