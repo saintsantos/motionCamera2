@@ -91,7 +91,7 @@ int x_dummy = 400;
 int y_dummy = 400;
 
 void sendObjectLocToArduino(int x, int y) {
-	char *portname = "/dev/ttyACM0";
+	char *portname = "/dev/ttyACM2";
   int fd = open(portname, O_RDWR | O_NOCTTY | O_SYNC);
   if (fd < 0)
   {
@@ -109,11 +109,24 @@ void sendObjectLocToArduino(int x, int y) {
 
 	string x_str = x_stream.str();
 	string y_str = y_stream.str();
+	//printf("X: %s\n", x_str.c_str());
+	//printf("Y: %s\n", y_str.c_str());
+/*	int x_len = x_str.length();
+	int y_len = x_str.length();
+	printf("X length: %d\n", x_len);
+	printf("Y length: %d\n", y_len);
 
+*/
+	write(fd, "x", 1);
+	usleep(100000);
 	write(fd, x_str.c_str(), x_str.length());
-	write(fd, " ", 1);
+	write(fd, "y", 1);
+	usleep(100000);
 	write(fd, y_str.c_str(), y_str.length());
-	write(fd, " ", 1);
+
+
+	x_dummy += 1;
+	y_dummy += 1 ;
 }
 
 using namespace cv;
@@ -313,9 +326,9 @@ int main(int argc, char* argv[])
 		//threshold matrix
 
 		//Track Orange
-		//inRange(HSV, Scalar(14, 80, 185), Scalar(45, 148, 256), threshold);
+		inRange(HSV, Scalar(0, 77, 136), Scalar(10, 153, 256), threshold);
 
-		inRange(HSV,Scalar(H_MIN,S_MIN,V_MIN),Scalar(H_MAX,S_MAX,V_MAX),threshold);
+		//inRange(HSV,Scalar(H_MIN,S_MIN,V_MIN),Scalar(H_MAX,S_MAX,V_MAX),threshold);
 		//perform morphological operations on thresholded image to eliminate noise
 		//and emphasize the filtered object(s)
 		if(useMorphOps)
@@ -325,7 +338,7 @@ int main(int argc, char* argv[])
 		//filtered object
 		if(trackObjects) {
 			trackFilteredObject(x,y,threshold,cameraFeed);
-			//sendObjectLocToArduino(x, y);
+			sendObjectLocToArduino(x, y);
 			//usleep(500000);
 		}
 		//show frames
@@ -338,11 +351,6 @@ int main(int argc, char* argv[])
 		//image will not appear without this waitKey() command
 		waitKey(30);
 	}
-
-
-
-
-
 
 	return 0;
 }

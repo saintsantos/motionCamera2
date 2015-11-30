@@ -4,6 +4,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <sstream>
+#include <cstring>
+#include <string>
+
+using namespace std;
 
 int
 set_interface_attribs (int fd, int speed, int parity)
@@ -65,18 +70,43 @@ set_blocking (int fd, int should_block)
 }
 
 int main() {
-  char *portname = "/dev/ttyACM0";
+  char *portname = "/dev/ttyACM2";
   int fd = open(portname, O_RDWR | O_NOCTTY | O_SYNC);
   if (fd < 0)
   {
           //error_message ("error %d opening %s: %s", errno, portname, strerror (errno));
-          return;
+          return -1;
   }
 
   set_interface_attribs (fd, B9600, 0);  // set speed to 115,200 bps, 8n1 (no parity)
   set_blocking (fd, 0);                // set no blocking
 
-  write (fd, "30", 2);           // send 7 character greeting
+  int x_dummy = 400;
+  int y_dummy = 400;
+  while(1)  {
+
+    ostringstream x_stream;
+  	x_stream << x_dummy;
+  	ostringstream y_stream;
+  	y_stream << y_dummy;
+
+  	string x_str = x_stream.str();
+  	string y_str = y_stream.str();
+
+    write(fd, "x", 1);
+    usleep(100000);
+    write (fd, x_str.c_str(), x_str.length());
+    write(fd, "y", 1);
+    usleep(100000);
+    write(fd, y_str.c_str(), y_str.length());
+
+    x_dummy += 1;
+    y_dummy += 1;
+
+    if (x_dummy > 600) {
+      return -1;
+    }
+  }         // send 7 character greeting
 
   usleep ((1 + 25) * 100);             // sleep enough to transmit the 7 plus
                                        // receive 25:  approx 100 uS per char transmit
