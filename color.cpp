@@ -87,9 +87,6 @@ set_blocking (int fd, int should_block)
                 //error_message ("error %d setting term attributes", errno);
 }
 
-int x_dummy = 400;
-int y_dummy = 400;
-
 void sendObjectLocToArduino(int x, int y) {
 	char *portname = "/dev/ttyACM2";
   int fd = open(portname, O_RDWR | O_NOCTTY | O_SYNC);
@@ -113,8 +110,8 @@ void sendObjectLocToArduino(int x, int y) {
 
 	string x_str = x_stream.str();
 	string y_str = y_stream.str();
-	printf("X: %s\n", x_str.c_str());
-	printf("Y: %s\n", y_str.c_str());
+	//printf("X: %s\n", x_str.c_str());
+	//printf("Y: %s\n", y_str.c_str());
 /*	int x_len = x_str.length();
 	int y_len = x_str.length();
 	printf("X length: %d\n", x_len);
@@ -122,15 +119,12 @@ void sendObjectLocToArduino(int x, int y) {
 
 */
 	write(fd, "x", 1);
-	usleep(100000);
+	usleep(5000);
 	write(fd, x_str.c_str(), x_str.length());
 	write(fd, "y", 1);
-	usleep(100000);
+	usleep(5000);
 	write(fd, y_str.c_str(), y_str.length());
 
-
-	x_dummy += 1;
-	y_dummy += 1 ;
 }
 
 using namespace cv;
